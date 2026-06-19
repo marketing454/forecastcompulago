@@ -3,9 +3,10 @@ require_once __DIR__ . '/../includes/auth.php';
 requireRole('ejecutivo');
 
 use App\Models\Oportunidad;
+use App\Models\Parametro;
 use App\Services\PipelineCalculator;
 
-$calculator = new PipelineCalculator();
+$calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $ejecutivoId = currentUserId();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -21,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['estado']
         );
     } elseif ($accion === 'desactivar') {
-        Oportunidad::setActiva((int) $_POST['id'], false);
+        Oportunidad::setActiva((int) $_POST['id'], false, $ejecutivoId);
     }
     header('Location: /pipeline.php');
     exit;

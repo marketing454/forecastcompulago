@@ -30,17 +30,17 @@ class Oportunidad
         return $row ?: null;
     }
 
-    public static function update(int $id, string $cuenta, string $nit, string $tipo, float $monto, string $estado): void
+    public static function update(int $id, string $cuenta, string $nit, string $tipo, float $monto, string $estado, int $ejecutivoId): void
     {
         $stmt = db()->prepare(
-            'UPDATE oportunidades SET cuenta = ?, nit = ?, tipo = ?, monto = ?, estado = ? WHERE id = ?'
+            'UPDATE oportunidades SET cuenta = ?, nit = ?, tipo = ?, monto = ?, estado = ? WHERE id = ? AND ejecutivo_id = ?'
         );
-        $stmt->execute([$cuenta, $nit, $tipo, $monto, $estado, $id]);
+        $stmt->execute([$cuenta, $nit, $tipo, $monto, $estado, $id, $ejecutivoId]);
     }
 
-    public static function setActiva(int $id, bool $activa): void
+    public static function setActiva(int $id, bool $activa, int $ejecutivoId): void
     {
-        $stmt = db()->prepare('UPDATE oportunidades SET activa = ? WHERE id = ?');
-        $stmt->execute([$activa ? 1 : 0, $id]);
+        $stmt = db()->prepare('UPDATE oportunidades SET activa = ? WHERE id = ? AND ejecutivo_id = ?');
+        $stmt->execute([$activa ? 1 : 0, $id, $ejecutivoId]);
     }
 }
