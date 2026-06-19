@@ -1,0 +1,69 @@
+<?php
+namespace Tests;
+
+use App\Services\PipelineCalculator;
+use DateTimeImmutable;
+use PHPUnit\Framework\TestCase;
+
+class PipelineCalculatorTest extends TestCase
+{
+    private PipelineCalculator $calculator;
+
+    protected function setUp(): void
+    {
+        $this->calculator = new PipelineCalculator();
+    }
+
+    public function test_dias_counts_days_between_creation_and_today(): void
+    {
+        $creada = new DateTimeImmutable('2026-06-01');
+        $hoy = new DateTimeImmutable('2026-06-10');
+        $this->assertSame(9, $this->calculator->dias($creada, $hoy));
+    }
+
+    public function test_probabilidad_is_alta_within_15_days(): void
+    {
+        $this->assertSame('ALTA', $this->calculator->probabilidad(15));
+    }
+
+    public function test_probabilidad_is_media_between_16_and_30_days(): void
+    {
+        $this->assertSame('MEDIA', $this->calculator->probabilidad(16));
+        $this->assertSame('MEDIA', $this->calculator->probabilidad(30));
+    }
+
+    public function test_probabilidad_is_baja_after_30_days(): void
+    {
+        $this->assertSame('BAJA', $this->calculator->probabilidad(31));
+    }
+
+    public function test_total_pipeline_sums_all_montos(): void
+    {
+        $this->assertSame(450.0, $this->calculator->totalPipeline([100, 150, 200]));
+    }
+
+    public function test_pronostico_ponderado_applies_flat_30_percent(): void
+    {
+        $this->assertSame(97350000.0, $this->calculator->pronosticoPonderado(324500000));
+    }
+
+    public function test_semaforo_rojo_at_or_below_30_percent_of_meta(): void
+    {
+        $this->assertSame('rojo', $this->calculator->semaforo(20_000_000, 150_000_000));
+    }
+
+    public function test_semaforo_ambar_between_30_and_80_percent_of_meta(): void
+    {
+        $this->assertSame('ambar', $this->calculator->semaforo(97_350_000, 150_000_000));
+    }
+
+    public function test_semaforo_verde_above_80_percent_of_meta(): void
+    {
+        $this->assertSame('verde', $this->calculator->semaforo(130_000_000, 150_000_000));
+    }
+
+    public function test_semaforo_rojo_when_meta_is_zero(): void
+    {
+        $this->assertSame('rojo', $this->calculator->semaforo(10_000, 0));
+    }
+}
