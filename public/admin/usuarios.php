@@ -37,11 +37,11 @@ require __DIR__ . '/../../includes/layout_header.php';
 </div>
 <?php endif; ?>
 
-<h2 class="section-title">Crear ejecutivo</h2>
 <div class="card">
+    <h2 class="card-title"><?= icono('persona') ?> Crear ejecutivo</h2>
     <form method="post">
         <input type="hidden" name="accion" value="crear">
-        <div class="form-row">
+        <div class="form-grid">
             <div>
                 <label for="nombre">Nombre</label>
                 <input type="text" id="nombre" name="nombre" required>
@@ -53,10 +53,11 @@ require __DIR__ . '/../../includes/layout_header.php';
             <div>
                 <label for="password">Contraseña temporal</label>
                 <input type="password" id="password" name="password" required>
+                <span class="field-hint">El ejecutivo debe cambiarla en su primer ingreso</span>
             </div>
-            <div>
-                <button type="submit">Crear</button>
-            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit">Crear ejecutivo</button>
         </div>
     </form>
 </div>

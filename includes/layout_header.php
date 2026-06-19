@@ -1,6 +1,19 @@
 <?php
 require_once __DIR__ . '/auth.php';
 $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
+
+function icono(string $nombre): string
+{
+    $trazos = [
+        'pipeline' => '<path d="M4 15V9M9 15V5M14 15v-4M17 15V7"/>',
+        'meta'     => '<circle cx="10" cy="10" r="6.5"/><circle cx="10" cy="10" r="2.5"/>',
+        'venta'    => '<circle cx="10" cy="10" r="7"/><path d="M10 6v8"/><path d="M12.5 8c0-1.1-1.1-2-2.5-2S7.5 6.8 7.5 7.8c0 2 5 .7 5 2.9 0 1-1.1 1.8-2.5 1.8S7.5 11.7 7.5 10.7"/>',
+        'ajustes'  => '<line x1="3" y1="5" x2="17" y2="5"/><circle cx="8" cy="5" r="1.6" fill="#ffffff"/><line x1="3" y1="10" x2="17" y2="10"/><circle cx="13" cy="10" r="1.6" fill="#ffffff"/><line x1="3" y1="15" x2="17" y2="15"/><circle cx="6" cy="15" r="1.6" fill="#ffffff"/>',
+        'persona'  => '<circle cx="10" cy="7" r="3"/><path d="M4 16.5c0-3 2.7-5 6-5s6 2 6 5"/>',
+    ];
+    $contenido = $trazos[$nombre] ?? '';
+    return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $contenido . '</svg>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -166,6 +179,15 @@ $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
             padding: 18px 20px;
         }
 
+        .stat-card .stat-head {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-head svg { color: var(--color-accent); flex-shrink: 0; }
+
         .stat-card .stat-label {
             display: block;
             font-size: 12px;
@@ -173,14 +195,21 @@ $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
             letter-spacing: 0.04em;
             text-transform: uppercase;
             color: var(--color-text-secondary);
-            margin-bottom: 8px;
         }
 
         .stat-card .stat-value {
             font-size: 24px;
             font-weight: 700;
             color: var(--color-text);
+            font-variant-numeric: tabular-nums;
         }
+
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card, .stat-card, .table-wrap, .empty-state { animation: rise-in 280ms ease-out; }
 
         .alert {
             display: flex;
@@ -239,6 +268,50 @@ $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
         .form-row > div { flex: 1 1 150px; min-width: 140px; }
         .form-row input, .form-row select { width: 100%; max-width: none; margin-bottom: 0; }
 
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px 16px;
+        }
+
+        .form-grid input, .form-grid select { width: 100%; max-width: none; margin-bottom: 0; }
+        .form-actions { margin-top: 18px; }
+
+        .field-hint {
+            display: block;
+            margin: 4px 0 14px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .form-grid .field-hint { margin: 6px 0 0; }
+
+        .field-hint-error { color: var(--color-error-text); }
+        .field-hint-success { color: var(--color-success-text); }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-text);
+            margin: 0 0 16px;
+        }
+
+        .card-title svg { color: var(--color-accent); flex-shrink: 0; }
+
+        form select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%235b6472' stroke-width='1.5'%3E%3Cpath d='M5 7l5 5 5-5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            padding-right: 36px;
+        }
+
+        .num { font-variant-numeric: tabular-nums; }
+
         button, .btn {
             display: inline-flex;
             align-items: center;
@@ -253,12 +326,14 @@ $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
             border: none;
             border-radius: var(--radius-sm);
             cursor: pointer;
-            transition: background-color 150ms ease;
+            transition: background-color 150ms ease, transform 100ms ease;
             text-decoration: none;
         }
 
         button:hover, .btn:hover { background: var(--color-primary-hover); }
+        button:active, .btn:active { transform: scale(0.97); }
         button:focus-visible, .btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+        button:disabled, .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 
         .btn-sm { min-height: 34px; padding: 0 12px; font-size: 13px; }
         .btn-danger { background: var(--color-error-text); }
@@ -332,7 +407,7 @@ $rutaActual = $_SERVER['SCRIPT_NAME'] ?? '';
         .verde { background: #00B050; color: #fff; }
 
         @media (prefers-reduced-motion: reduce) {
-            * { transition: none !important; }
+            * { transition: none !important; animation: none !important; }
         }
 
         @media (max-width: 720px) {

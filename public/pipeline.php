@@ -36,16 +36,18 @@ require __DIR__ . '/../includes/layout_header.php';
 <h1 class="page-title">Mi Pipeline</h1>
 
 <div class="card">
+    <h2 class="card-title"><?= icono('pipeline') ?> Nueva oportunidad</h2>
     <form method="post">
         <input type="hidden" name="accion" value="crear">
-        <div class="form-row">
+        <div class="form-grid">
             <div>
                 <label for="cuenta">Cuenta</label>
                 <input type="text" id="cuenta" name="cuenta" required>
             </div>
             <div>
                 <label for="nit">NIT</label>
-                <input type="text" id="nit" name="nit" required>
+                <input type="text" id="nit" name="nit" placeholder="900123456-7" required>
+                <span class="field-hint">Incluye el dígito de verificación</span>
             </div>
             <div>
                 <label for="tipo">Tipo</label>
@@ -61,7 +63,7 @@ require __DIR__ . '/../includes/layout_header.php';
             </div>
             <div>
                 <label for="monto">Monto</label>
-                <input type="number" id="monto" name="monto" step="0.01" required>
+                <input type="number" id="monto" name="monto" step="0.01" min="0" placeholder="0" required>
             </div>
             <div>
                 <label for="estado">Estado</label>
@@ -71,9 +73,9 @@ require __DIR__ . '/../includes/layout_header.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
-                <button type="submit">Agregar oportunidad</button>
-            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit">Agregar oportunidad</button>
         </div>
     </form>
 </div>
@@ -93,8 +95,8 @@ require __DIR__ . '/../includes/layout_header.php';
             <td><?= htmlspecialchars($op['cuenta']) ?></td>
             <td><?= htmlspecialchars($op['nit']) ?></td>
             <td><span class="badge badge-tipo"><?= htmlspecialchars($op['tipo']) ?></span></td>
-            <td><?= number_format((float) $op['monto'], 0) ?></td>
-            <td><?= $dias ?></td>
+            <td class="num"><?= number_format((float) $op['monto'], 0) ?></td>
+            <td class="num"><?= $dias ?></td>
             <td><?= $calculator->probabilidad($dias) ?></td>
             <td><span class="badge badge-estado-<?= htmlspecialchars(strtolower($op['estado'])) ?>"><?= htmlspecialchars($op['estado']) ?></span></td>
             <td>

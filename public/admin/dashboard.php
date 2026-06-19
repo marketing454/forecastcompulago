@@ -18,11 +18,11 @@ require __DIR__ . '/../../includes/layout_header.php';
 
 <div class="stat-grid">
     <div class="stat-card">
-        <span class="stat-label">Venta general (última semana por ejecutivo)</span>
+        <div class="stat-head"><?= icono('venta') ?><span class="stat-label">Venta general (última semana por ejecutivo)</span></div>
         <span class="stat-value"><?= number_format((float) $totalGeneral, 0) ?></span>
     </div>
     <div class="stat-card">
-        <span class="stat-label">Pipeline total de la empresa</span>
+        <div class="stat-head"><?= icono('pipeline') ?><span class="stat-label">Pipeline total de la empresa</span></div>
         <span class="stat-value"><?= number_format((float) $totalPipeline, 0) ?></span>
     </div>
 </div>
@@ -41,9 +41,9 @@ require __DIR__ . '/../../includes/layout_header.php';
         <tr>
             <td><?= htmlspecialchars($r['ejecutivo_nombre']) ?></td>
             <td><?= $r['fecha_reporte'] ?></td>
-            <td><?= number_format((float) $r['meta_mes'], 0) ?></td>
-            <td><?= number_format((float) $r['venta_general'], 0) ?></td>
-            <td><?= number_format((float) $r['pronostico_ponderado_snapshot'], 0) ?></td>
+            <td class="num"><?= number_format((float) $r['meta_mes'], 0) ?></td>
+            <td class="num"><?= number_format((float) $r['venta_general'], 0) ?></td>
+            <td class="num"><?= number_format((float) $r['pronostico_ponderado_snapshot'], 0) ?></td>
             <td><span class="<?= $s ?>"><?= strtoupper($s) ?></span></td>
         </tr>
     <?php endforeach; ?>
