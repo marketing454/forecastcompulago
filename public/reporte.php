@@ -42,7 +42,7 @@ require __DIR__ . '/../includes/layout_header.php';
 <?php if ($mensaje): ?><p style="color:green;"><?= htmlspecialchars($mensaje) ?></p><?php endif; ?>
 <?php if ($error): ?><p style="color:red;"><?= htmlspecialchars($error) ?></p><?php endif; ?>
 
-<p>Total pipeline activo: <?= number_format($totalPipeline, 0) ?> — Pronóstico ponderado (30%): <?= number_format($pronostico, 0) ?></p>
+<p>Total pipeline activo: <?= number_format($totalPipeline, 0) ?> — Pronóstico ponderado: <?= number_format($pronostico, 0) ?></p>
 
 <form method="post">
     <label>Meta del mes</label>
