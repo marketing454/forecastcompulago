@@ -84,4 +84,25 @@ class PipelineCalculatorTest extends TestCase
         $this->assertSame(9, $this->calculator->dias($a, $b));
         $this->assertSame(9, $this->calculator->dias($b, $a));
     }
+
+    public function test_from_parametros_builds_calculator_from_string_values(): void
+    {
+        $calculator = PipelineCalculator::fromParametros([
+            'umbral_dias_alta' => '15',
+            'umbral_dias_baja' => '30',
+            'pct_conversion_pipeline' => '0.30',
+            'umbral_semaforo_bajo' => '0.30',
+            'umbral_semaforo_alto' => '0.80',
+        ]);
+        $this->assertSame('ALTA', $calculator->probabilidad(15));
+        $this->assertSame('BAJA', $calculator->probabilidad(31));
+        $this->assertSame(97350000.0, $calculator->pronosticoPonderado(324500000));
+    }
+
+    public function test_from_parametros_falls_back_to_defaults_when_keys_missing(): void
+    {
+        $calculator = PipelineCalculator::fromParametros([]);
+        $this->assertSame('ALTA', $calculator->probabilidad(15));
+        $this->assertSame('rojo', $calculator->semaforo(20_000_000, 150_000_000));
+    }
 }

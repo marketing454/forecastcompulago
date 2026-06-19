@@ -4,6 +4,7 @@ requireRole('ejecutivo');
 
 use App\Models\MetaMensual;
 use App\Models\Oportunidad;
+use App\Models\Parametro;
 use App\Models\ReporteSemanal;
 use App\Services\PipelineCalculator;
 use App\Services\ReporteSemanalService;
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$calculator = new PipelineCalculator();
+$calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $montos = array_column(Oportunidad::activasByEjecutivo($ejecutivoId), 'monto');
 $totalPipeline = $calculator->totalPipeline($montos);
 $pronostico = $calculator->pronosticoPonderado($totalPipeline);

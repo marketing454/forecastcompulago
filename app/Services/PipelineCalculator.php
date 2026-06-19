@@ -14,6 +14,17 @@ class PipelineCalculator
     ) {
     }
 
+    public static function fromParametros(array $parametros): self
+    {
+        return new self(
+            (int) ($parametros['umbral_dias_alta'] ?? 15),
+            (int) ($parametros['umbral_dias_baja'] ?? 30),
+            (float) ($parametros['pct_conversion_pipeline'] ?? 0.30),
+            (float) ($parametros['umbral_semaforo_bajo'] ?? 0.30),
+            (float) ($parametros['umbral_semaforo_alto'] ?? 0.80),
+        );
+    }
+
     public function dias(DateTimeImmutable $fechaCreacion, DateTimeImmutable $hoy): int
     {
         return $hoy->diff($fechaCreacion)->days;

@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../../includes/auth.php';
 requireRole('admin');
 
+use App\Models\Parametro;
 use App\Models\ReporteSemanal;
 use App\Services\PipelineCalculator;
 
-$calculator = new PipelineCalculator();
+$calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $ultimos = ReporteSemanal::ultimoDeTodos();
 
 $totalGeneral = array_sum(array_column($ultimos, 'venta_general'));

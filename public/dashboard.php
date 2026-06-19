@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 requireRole('ejecutivo');
 
+use App\Models\Parametro;
 use App\Models\ReporteSemanal;
 use App\Services\PipelineCalculator;
 use App\Services\ReporteSemanalService;
@@ -9,7 +10,7 @@ use App\Services\ReporteSemanalService;
 $ejecutivoId = currentUserId();
 $historial = ReporteSemanal::historial($ejecutivoId);
 $actual = $historial[0] ?? null;
-$calculator = new PipelineCalculator();
+$calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $servicio = new ReporteSemanalService();
 
 require __DIR__ . '/../includes/layout_header.php';

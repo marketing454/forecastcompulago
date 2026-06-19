@@ -36,7 +36,7 @@ class ReporteSemanal
     {
         $fechaSemana = self::fechaInicioSemana(new DateTimeImmutable());
         $montos = array_column(Oportunidad::activasByEjecutivo($ejecutivoId), 'monto');
-        $calculator = new PipelineCalculator();
+        $calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
         $totalPipeline = $calculator->totalPipeline($montos);
         $pronostico = $calculator->pronosticoPonderado($totalPipeline);
 
