@@ -66,4 +66,22 @@ class PipelineCalculatorTest extends TestCase
     {
         $this->assertSame('rojo', $this->calculator->semaforo(10_000, 0));
     }
+
+    public function test_semaforo_is_rojo_at_exactly_30_percent_of_meta(): void
+    {
+        $this->assertSame('rojo', $this->calculator->semaforo(30, 100));
+    }
+
+    public function test_semaforo_is_ambar_at_exactly_80_percent_of_meta(): void
+    {
+        $this->assertSame('ambar', $this->calculator->semaforo(80, 100));
+    }
+
+    public function test_dias_is_unaffected_by_argument_order(): void
+    {
+        $a = new DateTimeImmutable('2026-06-01');
+        $b = new DateTimeImmutable('2026-06-10');
+        $this->assertSame(9, $this->calculator->dias($a, $b));
+        $this->assertSame(9, $this->calculator->dias($b, $a));
+    }
 }
