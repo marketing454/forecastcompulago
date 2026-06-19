@@ -1,0 +1,20 @@
+# Datos reales de clientes (NITs, montos, cuentas) — no se sube al repo
+*.xlsx
+
+# PHP / Composer
+/vendor/
+composer.phar
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Docker
+docker/data/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
