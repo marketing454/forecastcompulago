@@ -5,7 +5,9 @@ requireRole('ejecutivo');
 use App\Models\MetaMensual;
 use App\Models\Oportunidad;
 use App\Models\Parametro;
+use App\Models\ReporteSemanal;
 use App\Services\PipelineCalculator;
+use App\Services\ReporteSemanalService;
 
 $calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $ejecutivoId = currentUserId();
@@ -69,6 +71,14 @@ $metaDelMes = MetaMensual::forEjecutivoMes($ejecutivoId, (int) $hoy->format('Y')
 $metaMesLive = (float) ($metaDelMes['monto_meta'] ?? 0);
 $semaforoLive = $calculator->semaforo($pronosticoLive, $metaMesLive);
 
+$ultimoReporte = ReporteSemanal::historial($ejecutivoId)[0] ?? null;
+if ($ultimoReporte !== null) {
+    $servicioVenta = new ReporteSemanalService();
+    $ventaOtrosUltimo = $servicioVenta->ventaOtros((float) $ultimoReporte['venta_general'], (float) $ultimoReporte['venta_empresas']);
+    $pctEmpresasUltimo = $servicioVenta->participacion((float) $ultimoReporte['venta_empresas'], (float) $ultimoReporte['venta_general']) * 100;
+    $pctOtrosUltimo = $servicioVenta->participacion($ventaOtrosUltimo, (float) $ultimoReporte['venta_general']) * 100;
+}
+
 require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Mi Pipeline</h1>
@@ -92,6 +102,26 @@ require __DIR__ . '/../includes/layout_header.php';
         </div>
     </div>
 </div>
+
+<?php if ($ultimoReporte !== null): ?>
+<div class="card">
+    <h2 class="card-title"><?= icono('venta') ?> Venta semanal por categoría</h2>
+    <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
+        <?= donutSvg($pctEmpresasUltimo, $pctOtrosUltimo) ?>
+        <div style="text-align:left; min-width:200px;">
+            <p style="display:flex; align-items:center; gap:8px; margin:0 0 10px; font-size:15px; color:var(--color-text-secondary);">
+                <span style="width:12px; height:12px; border-radius:3px; background:#1c2b4a; flex-shrink:0;"></span>
+                Empresas: <strong style="color:var(--color-text);"><?= pesos($ultimoReporte['venta_empresas']) ?></strong> (<?= number_format($pctEmpresasUltimo, 1) ?>%)
+            </p>
+            <p style="display:flex; align-items:center; gap:8px; margin:0; font-size:15px; color:var(--color-text-secondary);">
+                <span style="width:12px; height:12px; border-radius:3px; background:#90a4d4; flex-shrink:0;"></span>
+                Otros: <strong style="color:var(--color-text);"><?= pesos($ventaOtrosUltimo) ?></strong> (<?= number_format($pctOtrosUltimo, 1) ?>%)
+            </p>
+            <p style="margin:14px 0 0; font-size:13px; color:var(--color-text-secondary);">Semana del <?= htmlspecialchars($ultimoReporte['fecha_reporte']) ?> — Total: <strong style="color:var(--color-text);"><?= pesos($ultimoReporte['venta_general']) ?></strong></p>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <div class="card">
     <h2 class="card-title"><?= icono('pipeline') ?> <?= $enEdicion ? 'Editar oportunidad' : 'Nueva oportunidad' ?></h2>

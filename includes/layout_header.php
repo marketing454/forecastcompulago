@@ -41,6 +41,21 @@ function gaugeSvg(string $semaforo, float $valor, float $meta): string
         . '<text x="85" y="103" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#5b6472">de la meta</text>'
         . '</svg>';
 }
+
+function donutSvg(float $pctEmpresas, float $pctOtros): string
+{
+    $radio = 68;
+    $circunferencia = 2 * M_PI * $radio;
+    $longitudEmpresas = $circunferencia * (min(max($pctEmpresas, 0), 100) / 100);
+    $longitudOtros = $circunferencia * (min(max($pctOtros, 0), 100) / 100);
+    $etiqueta = htmlspecialchars('Empresas ' . number_format($pctEmpresas, 1) . '%, Otros ' . number_format($pctOtros, 1) . '%');
+
+    return '<svg width="170" height="170" viewBox="0 0 170 170" role="img" aria-label="' . $etiqueta . '">'
+        . '<circle cx="85" cy="85" r="' . $radio . '" fill="none" stroke="#eef1f6" stroke-width="16"/>'
+        . '<circle cx="85" cy="85" r="' . $radio . '" fill="none" stroke="#1c2b4a" stroke-width="16" stroke-dasharray="' . $longitudEmpresas . ' ' . $circunferencia . '" transform="rotate(-90 85 85)"/>'
+        . '<circle cx="85" cy="85" r="' . $radio . '" fill="none" stroke="#90a4d4" stroke-width="16" stroke-dasharray="' . $longitudOtros . ' ' . $circunferencia . '" stroke-dashoffset="' . (-$longitudEmpresas) . '" transform="rotate(-90 85 85)"/>'
+        . '</svg>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">

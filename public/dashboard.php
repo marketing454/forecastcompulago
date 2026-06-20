@@ -32,11 +32,6 @@ require __DIR__ . '/../includes/layout_header.php';
     $ventaOtros = $servicio->ventaOtros((float) $actual['venta_general'], (float) $actual['venta_empresas']);
     $pctEmpresas = $servicio->participacion((float) $actual['venta_empresas'], (float) $actual['venta_general']) * 100;
     $pctOtros = $servicio->participacion($ventaOtros, (float) $actual['venta_general']) * 100;
-
-    $radioDonut = 68;
-    $circunferenciaDonut = 2 * M_PI * $radioDonut;
-    $longitudEmpresas = $circunferenciaDonut * ($pctEmpresas / 100);
-    $longitudOtros = $circunferenciaDonut * ($pctOtros / 100);
     ?>
     <div class="card">
         <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
@@ -69,16 +64,7 @@ require __DIR__ . '/../includes/layout_header.php';
     <h2 class="section-title">Venta semanal por categoría</h2>
     <div class="card">
         <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
-            <svg width="170" height="170" viewBox="0 0 170 170" role="img" aria-label="Empresas <?= number_format($pctEmpresas, 1) ?>%, Otros <?= number_format($pctOtros, 1) ?>%">
-                <circle cx="85" cy="85" r="<?= $radioDonut ?>" fill="none" stroke="#eef1f6" stroke-width="16"/>
-                <circle cx="85" cy="85" r="<?= $radioDonut ?>" fill="none" stroke="#1c2b4a" stroke-width="16"
-                        stroke-dasharray="<?= $longitudEmpresas ?> <?= $circunferenciaDonut ?>"
-                        transform="rotate(-90 85 85)"/>
-                <circle cx="85" cy="85" r="<?= $radioDonut ?>" fill="none" stroke="#90a4d4" stroke-width="16"
-                        stroke-dasharray="<?= $longitudOtros ?> <?= $circunferenciaDonut ?>"
-                        stroke-dashoffset="<?= -$longitudEmpresas ?>"
-                        transform="rotate(-90 85 85)"/>
-            </svg>
+            <?= donutSvg($pctEmpresas, $pctOtros) ?>
             <div style="text-align:left; min-width:200px;">
                 <p style="display:flex; align-items:center; gap:8px; margin:0 0 10px; font-size:15px; color:var(--color-text-secondary);">
                     <span style="width:12px; height:12px; border-radius:3px; background:#1c2b4a; flex-shrink:0;"></span>
