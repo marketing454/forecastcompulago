@@ -11,7 +11,11 @@ use App\Services\ReporteSemanalService;
 
 $ejecutivoId = currentUserId();
 $hoy = new DateTimeImmutable();
-$reporteActual = ReporteSemanal::findSemanaActual($ejecutivoId);
+$fechaSemanaActual = ReporteSemanal::fechaInicioSemana($hoy);
+$fechaSemana = $_GET['semana'] ?? $fechaSemanaActual;
+$esSemanaActual = $fechaSemana === $fechaSemanaActual;
+
+$reporteActual = ReporteSemanal::findPorFecha($ejecutivoId, $fechaSemana);
 $metaDelMes = MetaMensual::forEjecutivoMes($ejecutivoId, (int) $hoy->format('Y'), (int) $hoy->format('n'));
 $metaMesDefault = $reporteActual['meta_mes'] ?? ($metaDelMes['monto_meta'] ?? 0);
 
@@ -23,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ventaGeneral = (float) $_POST['venta_general'];
         $ventaEmpresas = (float) $_POST['venta_empresas'];
         $servicio->ventaOtros($ventaGeneral, $ventaEmpresas);
-        ReporteSemanal::guardar($ejecutivoId, (float) $_POST['meta_mes'], $ventaEmpresas, $ventaGeneral, $_POST['comentarios']);
+        ReporteSemanal::guardar($ejecutivoId, (float) $_POST['meta_mes'], $ventaEmpresas, $ventaGeneral, $_POST['comentarios'], $_POST['fecha_semana']);
         $mensaje = 'Reporte guardado.';
-        $reporteActual = ReporteSemanal::findSemanaActual($ejecutivoId);
+        $reporteActual = ReporteSemanal::findPorFecha($ejecutivoId, $fechaSemana);
     } catch (InvalidArgumentException $e) {
         $error = $e->getMessage();
     }
@@ -39,6 +43,12 @@ $pronostico = $calculator->pronosticoPonderado($totalPipeline);
 require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Reporte Semanal</h1>
+<?php if (!$esSemanaActual): ?>
+<div class="alert" style="background:#eff4ff; border:1px solid #c7d9fb; color:#2654b8;">
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 6.5v4M10 13.5h.01M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>Estás editando la semana del <?= htmlspecialchars($fechaSemana) ?> (no es la semana actual). <a href="/reporte.php">Ir a la semana actual</a>.</span>
+</div>
+<?php endif; ?>
 <?php if ($mensaje): ?>
 <div class="alert alert-success" role="status">
     <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M6.5 10.5l2.5 2.5 5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -64,8 +74,9 @@ require __DIR__ . '/../includes/layout_header.php';
 </div>
 
 <div class="card">
-    <h2 class="card-title"><?= icono('venta') ?> Venta de esta semana</h2>
+    <h2 class="card-title"><?= icono('venta') ?> Venta de la semana del <?= htmlspecialchars($fechaSemana) ?></h2>
     <form method="post" id="form-reporte">
+        <input type="hidden" name="fecha_semana" value="<?= htmlspecialchars($fechaSemana) ?>">
         <label for="meta_mes">Meta del mes</label>
         <input type="number" id="meta_mes" name="meta_mes" step="0.01" min="0" value="<?= htmlspecialchars((string) $metaMesDefault) ?>" required>
 
@@ -80,7 +91,7 @@ require __DIR__ . '/../includes/layout_header.php';
         <textarea id="comentarios" name="comentarios" rows="4" placeholder="Novedades, seguimientos pendientes, contexto de la semana..."><?= htmlspecialchars($reporteActual['comentarios'] ?? '') ?></textarea>
 
         <div class="form-actions">
-            <button type="submit">Guardar reporte de esta semana</button>
+            <button type="submit"><?= $esSemanaActual ? 'Guardar reporte de esta semana' : 'Guardar cambios' ?></button>
         </div>
     </form>
 </div>

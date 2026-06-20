@@ -363,6 +363,8 @@ function icono(string $nombre): string
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: #fafbfd; }
 
+        .table-actions-cell { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
         .empty-state {
             background: var(--color-card);
             border-radius: var(--radius);

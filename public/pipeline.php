@@ -8,6 +8,7 @@ use App\Services\PipelineCalculator;
 
 $calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
 $ejecutivoId = currentUserId();
+$verTodas = ($_GET['ver'] ?? '') === 'todas';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
@@ -21,67 +22,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             (float) $_POST['monto'],
             $_POST['estado']
         );
+    } elseif ($accion === 'actualizar') {
+        Oportunidad::update(
+            (int) $_POST['id'],
+            $_POST['cuenta'],
+            $_POST['nit'],
+            $_POST['tipo'],
+            (float) $_POST['monto'],
+            $_POST['estado'],
+            $ejecutivoId
+        );
     } elseif ($accion === 'desactivar') {
         Oportunidad::setActiva((int) $_POST['id'], false, $ejecutivoId);
+    } elseif ($accion === 'reactivar') {
+        Oportunidad::setActiva((int) $_POST['id'], true, $ejecutivoId);
     }
-    header('Location: /pipeline.php');
+    header('Location: /pipeline.php' . ($verTodas ? '?ver=todas' : ''));
     exit;
 }
 
-$oportunidades = Oportunidad::activasByEjecutivo($ejecutivoId);
+$oportunidades = $verTodas ? Oportunidad::todasByEjecutivo($ejecutivoId) : Oportunidad::activasByEjecutivo($ejecutivoId);
 $hoy = new DateTimeImmutable();
+
+$tipos = ['COMPUTO','SERVIDOR','IMPRESION','SOFTWARE','IMAGEN_Y_VIDEO','SERVICIOS','CONECTIVIDAD','COMBINADO'];
+$estados = [
+    'ES'    => 'Estudio',
+    'POC'   => 'Por orden de compra',
+    'COC'   => 'Con orden de compra',
+    'PF'    => 'Por facturar',
+    'OTROS' => 'Otro',
+];
+
+$enEdicion = null;
+if (isset($_GET['editar'])) {
+    $candidata = Oportunidad::find((int) $_GET['editar']);
+    if ($candidata !== null && (int) $candidata['ejecutivo_id'] === $ejecutivoId) {
+        $enEdicion = $candidata;
+    }
+}
 
 require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Mi Pipeline</h1>
 
 <div class="card">
-    <h2 class="card-title"><?= icono('pipeline') ?> Nueva oportunidad</h2>
+    <h2 class="card-title"><?= icono('pipeline') ?> <?= $enEdicion ? 'Editar oportunidad' : 'Nueva oportunidad' ?></h2>
+    <?php if ($enEdicion): ?>
+        <p class="field-hint" style="margin-top:-6px;">Editando <strong style="color:var(--color-text);"><?= htmlspecialchars($enEdicion['cuenta']) ?></strong> — <a href="/pipeline.php<?= $verTodas ? '?ver=todas' : '' ?>">Cancelar</a></p>
+    <?php endif; ?>
     <form method="post">
-        <input type="hidden" name="accion" value="crear">
+        <input type="hidden" name="accion" value="<?= $enEdicion ? 'actualizar' : 'crear' ?>">
+        <?php if ($enEdicion): ?><input type="hidden" name="id" value="<?= $enEdicion['id'] ?>"><?php endif; ?>
         <div class="form-grid">
             <div>
                 <label for="cuenta">Cuenta</label>
-                <input type="text" id="cuenta" name="cuenta" required>
+                <input type="text" id="cuenta" name="cuenta" value="<?= htmlspecialchars($enEdicion['cuenta'] ?? '') ?>" required>
             </div>
             <div>
                 <label for="nit">NIT</label>
-                <input type="text" id="nit" name="nit" placeholder="900123456-7" required>
+                <input type="text" id="nit" name="nit" placeholder="900123456-7" value="<?= htmlspecialchars($enEdicion['nit'] ?? '') ?>" required>
                 <span class="field-hint">Incluye el dígito de verificación</span>
             </div>
             <div>
                 <label for="tipo">Tipo</label>
                 <select id="tipo" name="tipo" required>
-                    <?php foreach (['COMPUTO','SERVIDOR','IMPRESION','SOFTWARE','IMAGEN_Y_VIDEO','SERVICIOS','CONECTIVIDAD','COMBINADO'] as $tipo): ?>
-                        <option value="<?= $tipo ?>"><?= $tipo ?></option>
+                    <?php foreach ($tipos as $tipo): ?>
+                        <option value="<?= $tipo ?>" <?= ($enEdicion['tipo'] ?? '') === $tipo ? 'selected' : '' ?>><?= $tipo ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div>
                 <label for="fecha_creacion">Fecha</label>
-                <input type="date" id="fecha_creacion" name="fecha_creacion" value="<?= $hoy->format('Y-m-d') ?>" required>
+                <input type="date" id="fecha_creacion" name="fecha_creacion" value="<?= htmlspecialchars($enEdicion['fecha_creacion'] ?? $hoy->format('Y-m-d')) ?>" <?= $enEdicion ? 'disabled' : '' ?> required>
+                <?php if ($enEdicion): ?><span class="field-hint">La fecha de creación no se puede modificar</span><?php endif; ?>
             </div>
             <div>
                 <label for="monto">Monto</label>
-                <input type="number" id="monto" name="monto" step="0.01" min="0" placeholder="0" required>
+                <input type="number" id="monto" name="monto" step="0.01" min="0" placeholder="0" value="<?= htmlspecialchars((string) ($enEdicion['monto'] ?? '')) ?>" required>
             </div>
             <div>
                 <label for="estado">Estado</label>
                 <select id="estado" name="estado" required>
-                    <?php foreach (['ES','POC','COC','PF','OTROS'] as $estado): ?>
-                        <option value="<?= $estado ?>"><?= $estado ?></option>
+                    <?php foreach ($estados as $valor => $etiqueta): ?>
+                        <option value="<?= $valor ?>" <?= ($enEdicion['estado'] ?? '') === $valor ? 'selected' : '' ?>><?= $valor ?> - <?= $etiqueta ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
         </div>
         <div class="form-actions">
-            <button type="submit">Agregar oportunidad</button>
+            <button type="submit"><?= $enEdicion ? 'Guardar cambios' : 'Agregar oportunidad' ?></button>
         </div>
     </form>
 </div>
 
+<p style="margin: -8px 0 20px;">
+    <a href="/pipeline.php<?= $verTodas ? '' : '?ver=todas' ?>"><?= $verTodas ? 'Ver solo activas' : 'Ver también inactivas' ?></a>
+</p>
+
 <?php if (empty($oportunidades)): ?>
-    <div class="empty-state">Aún no tienes oportunidades activas en tu pipeline.</div>
+    <div class="empty-state"><?= $verTodas ? 'Todavía no tienes ninguna oportunidad registrada.' : 'Aún no tienes oportunidades activas en tu pipeline.' ?></div>
 <?php else: ?>
 <div class="table-wrap">
 <table>
@@ -91,19 +130,20 @@ require __DIR__ . '/../includes/layout_header.php';
     <tbody>
     <?php foreach ($oportunidades as $op): ?>
         <?php $dias = $calculator->dias(new DateTimeImmutable($op['fecha_creacion']), $hoy); ?>
-        <tr>
-            <td><?= htmlspecialchars($op['cuenta']) ?></td>
+        <tr<?= $op['activa'] ? '' : ' style="opacity:0.55;"' ?>>
+            <td><?= htmlspecialchars($op['cuenta']) ?><?= $op['activa'] ? '' : ' <span class="badge badge-neutral">Inactiva</span>' ?></td>
             <td><?= htmlspecialchars($op['nit']) ?></td>
             <td><span class="badge badge-tipo"><?= htmlspecialchars($op['tipo']) ?></span></td>
             <td class="num"><?= number_format((float) $op['monto'], 0) ?></td>
             <td class="num"><?= $dias ?></td>
             <td><?= $calculator->probabilidad($dias) ?></td>
-            <td><span class="badge badge-estado-<?= htmlspecialchars(strtolower($op['estado'])) ?>"><?= htmlspecialchars($op['estado']) ?></span></td>
-            <td>
+            <td><span class="badge badge-estado-<?= htmlspecialchars(strtolower($op['estado'])) ?>" title="<?= htmlspecialchars($estados[$op['estado']] ?? '') ?>"><?= htmlspecialchars($op['estado']) ?></span></td>
+            <td class="table-actions-cell">
+                <a href="/pipeline.php?editar=<?= $op['id'] ?><?= $verTodas ? '&ver=todas' : '' ?>" class="btn btn-secondary btn-sm">Editar</a>
                 <form method="post">
-                    <input type="hidden" name="accion" value="desactivar">
+                    <input type="hidden" name="accion" value="<?= $op['activa'] ? 'desactivar' : 'reactivar' ?>">
                     <input type="hidden" name="id" value="<?= $op['id'] ?>">
-                    <button type="submit" class="btn-secondary btn-sm">Desactivar</button>
+                    <button type="submit" class="btn-sm <?= $op['activa'] ? 'btn-secondary' : '' ?>"><?= $op['activa'] ? 'Desactivar' : 'Reactivar' ?></button>
                 </form>
             </td>
         </tr>

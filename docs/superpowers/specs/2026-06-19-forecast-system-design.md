@@ -83,7 +83,7 @@ Dos ciclos de vida distintos que el Excel mezclaba en una sola hoja:
   - `total_pipeline_snapshot` = suma de `monto` de oportunidades activas del ejecutivo en ese momento.
   - `pronostico_ponderado_snapshot` = `total_pipeline_snapshot × 30%`.
 - Restricción: un solo reporte por ejecutivo por semana calendario (si ya existe, se edita en lugar de crear uno nuevo).
-- Regla: reportes de semanas pasadas son de **solo lectura** una vez termina la semana — no editables retroactivamente.
+- **Actualización 2026-06-20:** se revirtió la regla original de "solo lectura" para semanas pasadas — ahora son editables y borrables (borrado físico real) sin excepción, decisión explícita del usuario. Al editar una semana pasada, el snapshot del pipeline (`total_pipeline_snapshot`/`pronostico_ponderado_snapshot`) se conserva tal cual quedó guardado, no se recalcula con el pipeline de hoy.
 
 ### `parametros` (configuración global, clave-valor, editable por admin, no quemada en código)
 
@@ -111,14 +111,14 @@ Dos ciclos de vida distintos que el Excel mezclaba en una sola hoja:
 ## 7. Pantallas
 
 **Vista Ejecutivo**
-- *Mi Pipeline*: tabla CRUD de oportunidades (crear, editar monto/estado, marcar inactiva).
-- *Mi Reporte Semanal*: formulario (meta del mes prellenada, venta empresas, venta general → calcula en vivo OTROS y participación, comentarios). Un reporte por semana; edita el de la semana actual si ya existe.
-- *Mi Dashboard*: semáforo actual, gráfico EMPRESAS/OTROS, total pipeline, histórico de reportes semanales pasados (solo lectura).
+- *Mi Pipeline*: CRUD completo de oportunidades — crear, editar (cuenta/NIT/tipo/monto/estado; la fecha de creación no se edita porque de ahí depende `dias`/`probabilidad`), desactivar y reactivar (toggle "Ver también inactivas"). Nunca se borra físicamente (decisión registrada abajo).
+- *Mi Reporte Semanal*: formulario (meta del mes prellenada, venta empresas, venta general → calcula en vivo OTROS y participación, comentarios). Un reporte por semana calendario; permite editar la semana actual **o cualquier semana pasada** vía `?semana=YYYY-MM-DD`. Al editar una semana pasada, el snapshot del pipeline (`total_pipeline_snapshot`/`pronostico_ponderado_snapshot`) **no se recalcula** con el pipeline de hoy — se conserva el valor original para no falsear el histórico.
+- *Mi Dashboard*: semáforo actual, gráfico EMPRESAS/OTROS, total pipeline, histórico de reportes semanales con acciones de **editar** (lleva a Reporte Semanal con esa fecha) y **borrar** (con confirmación, borrado físico real — ver decisión abajo).
 
 **Vista Admin/Gerente**
 - *Dashboard consolidado*: semáforo y totales por ejecutivo, ranking, total general de la empresa, tendencia histórica de todos los ejecutivos.
-- *Gestión de usuarios*: alta/baja de ejecutivos, asignación de meta mensual por ejecutivo.
-- *Parámetros*: edición de `pct_conversion_pipeline`, umbrales de antigüedad y umbrales del semáforo.
+- *Gestión de usuarios*: CRUD de ejecutivos — crear, editar nombre/email, activar/desactivar (nunca borrado físico, ver decisión abajo), asignación de meta mensual por ejecutivo (con la meta actual visible, no a ciegas).
+- *Parámetros*: edición de `pct_conversion_pipeline`, umbrales de antigüedad y umbrales del semáforo, con etiquetas legibles y explicación de cada uno (no las claves crudas de la tabla).
 
 ## 8. Fuera de alcance (MVP)
 
@@ -233,3 +233,6 @@ INSERT INTO parametros (clave, valor, descripcion) VALUES
 - El pipeline de oportunidades es una entidad persistente (vive entre semanas); el reporte semanal es una foto/snapshot independiente.
 - Stack: PHP + MySQL + Docker, igual que los demás proyectos internos de Compulago.
 - `parametros` (configuración global) y `metas_mensuales` (meta por ejecutivo/mes) son tablas separadas por tener cardinalidad distinta.
+- **(2026-06-20)** Oportunidades: "eliminar" significa desactivar/reactivar, nunca borrado físico — se confirma la decisión original, se completa la edición (cuenta/NIT/tipo/monto/estado) y se agrega vista de inactivas con reactivación.
+- **(2026-06-20)** Usuarios (ejecutivos): "eliminar" significa desactivar/reactivar, nunca borrado físico — un borrado real implicaría cascada sobre oportunidades/reportes/metas del usuario, riesgo que el usuario decidió no asumir. Se completa la edición de nombre/email.
+- **(2026-06-20)** Reportes semanales: a diferencia de los dos anteriores, aquí sí se habilitó borrado físico real y edición sin restricción de semana (ver actualización en sección 5). Es la única entidad con delete real en el sistema.

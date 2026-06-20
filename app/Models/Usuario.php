@@ -39,4 +39,10 @@ class Usuario
         $stmt = db()->prepare('UPDATE usuarios SET activo = ? WHERE id = ?');
         $stmt->execute([$activo ? 1 : 0, $id]);
     }
+
+    public static function actualizar(int $id, string $nombre, string $email): void
+    {
+        $stmt = db()->prepare('UPDATE usuarios SET nombre = ?, email = ? WHERE id = ?');
+        $stmt->execute([$nombre, $email, $id]);
+    }
 }

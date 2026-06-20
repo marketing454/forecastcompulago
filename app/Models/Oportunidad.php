@@ -22,6 +22,15 @@ class Oportunidad
         return $stmt->fetchAll();
     }
 
+    public static function todasByEjecutivo(int $ejecutivoId): array
+    {
+        $stmt = db()->prepare(
+            'SELECT * FROM oportunidades WHERE ejecutivo_id = ? ORDER BY activa DESC, fecha_creacion DESC'
+        );
+        $stmt->execute([$ejecutivoId]);
+        return $stmt->fetchAll();
+    }
+
     public static function find(int $id): ?array
     {
         $stmt = db()->prepare('SELECT * FROM oportunidades WHERE id = ? LIMIT 1');

@@ -8,6 +8,13 @@ use App\Services\PipelineCalculator;
 use App\Services\ReporteSemanalService;
 
 $ejecutivoId = currentUserId();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminar_reporte') {
+    ReporteSemanal::eliminar((int) $_POST['id'], $ejecutivoId);
+    header('Location: /dashboard.php');
+    exit;
+}
+
 $historial = ReporteSemanal::historial($ejecutivoId);
 $actual = $historial[0] ?? null;
 $calculator = PipelineCalculator::fromParametros(Parametro::allAsAssoc());
@@ -61,7 +68,7 @@ require __DIR__ . '/../includes/layout_header.php';
 <div class="table-wrap">
 <table>
     <thead>
-        <tr><th>Semana</th><th>Meta mes</th><th>Venta general</th><th>Pronóstico</th><th>Semáforo</th></tr>
+        <tr><th>Semana</th><th>Meta mes</th><th>Venta general</th><th>Pronóstico</th><th>Semáforo</th><th></th></tr>
     </thead>
     <tbody>
     <?php foreach ($historial as $reporte): ?>
@@ -72,6 +79,14 @@ require __DIR__ . '/../includes/layout_header.php';
             <td class="num"><?= number_format((float) $reporte['venta_general'], 0) ?></td>
             <td class="num"><?= number_format((float) $reporte['pronostico_ponderado_snapshot'], 0) ?></td>
             <td><span class="<?= $s ?>"><?= strtoupper($s) ?></span></td>
+            <td class="table-actions-cell">
+                <a href="/reporte.php?semana=<?= $reporte['fecha_reporte'] ?>" class="btn btn-secondary btn-sm">Editar</a>
+                <form method="post" onsubmit="return confirm('¿Borrar el reporte de la semana del <?= $reporte['fecha_reporte'] ?>? Esta acción no se puede deshacer.');">
+                    <input type="hidden" name="accion" value="eliminar_reporte">
+                    <input type="hidden" name="id" value="<?= $reporte['id'] ?>">
+                    <button type="submit" class="btn-danger btn-sm">Borrar</button>
+                </form>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
