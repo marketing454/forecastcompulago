@@ -36,9 +36,9 @@ require __DIR__ . '/../includes/layout_header.php';
     ?>
     <div class="card">
         <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
-        <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+        <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
             <div style="flex-shrink:0;"><?= gaugeSvg($semaforo, (float) $actual['pronostico_ponderado_snapshot'], (float) $actual['meta_mes']) ?></div>
-            <div style="flex:1; min-width:220px;">
+            <div style="text-align:left; min-width:220px;">
                 <span class="stat-label" style="display:block; margin-bottom:8px;">Pronóstico ponderado</span>
                 <span class="stat-value" style="font-size:30px;"><?= pesos($actual['pronostico_ponderado_snapshot']) ?></span>
                 <p style="margin:12px 0 0; font-size:16px; color:var(--color-text-secondary);">
