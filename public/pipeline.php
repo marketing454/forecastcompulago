@@ -83,7 +83,8 @@ require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Mi Pipeline</h1>
 
-<div class="card">
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px; margin-bottom:24px;">
+<div class="card" style="margin-bottom:0;">
     <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
     <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
         <div style="flex-shrink:0;"><?= gaugeSvg($semaforoLive, $pronosticoLive, $metaMesLive) ?></div>
@@ -104,7 +105,7 @@ require __DIR__ . '/../includes/layout_header.php';
 </div>
 
 <?php if ($ultimoReporte !== null): ?>
-<div class="card">
+<div class="card" style="margin-bottom:0;">
     <h2 class="card-title"><?= icono('venta') ?> Venta semanal por categoría</h2>
     <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
         <?= donutSvg($pctEmpresasUltimo, $pctOtrosUltimo) ?>
@@ -122,6 +123,7 @@ require __DIR__ . '/../includes/layout_header.php';
     </div>
 </div>
 <?php endif; ?>
+</div>
 
 <div class="card">
     <h2 class="card-title"><?= icono('pipeline') ?> <?= $enEdicion ? 'Editar oportunidad' : 'Nueva oportunidad' ?></h2>

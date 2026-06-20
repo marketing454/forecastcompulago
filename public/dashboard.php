@@ -33,7 +33,8 @@ require __DIR__ . '/../includes/layout_header.php';
     $pctEmpresas = $servicio->participacion((float) $actual['venta_empresas'], (float) $actual['venta_general']) * 100;
     $pctOtros = $servicio->participacion($ventaOtros, (float) $actual['venta_general']) * 100;
     ?>
-    <div class="card">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px; margin-bottom:24px;">
+    <div class="card" style="margin-bottom:0;">
         <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
         <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
             <div style="flex-shrink:0;"><?= gaugeSvg($semaforo, (float) $actual['pronostico_ponderado_snapshot'], (float) $actual['meta_mes']) ?></div>
@@ -50,19 +51,8 @@ require __DIR__ . '/../includes/layout_header.php';
         </div>
     </div>
 
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div class="stat-head"><?= icono('pipeline') ?><span class="stat-label">Total pipeline</span></div>
-            <span class="stat-value"><?= pesos($actual['total_pipeline_snapshot']) ?></span>
-        </div>
-        <div class="stat-card">
-            <div class="stat-head"><?= icono('venta') ?><span class="stat-label">Pronóstico ponderado</span></div>
-            <span class="stat-value"><?= pesos($actual['pronostico_ponderado_snapshot']) ?></span>
-        </div>
-    </div>
-
-    <h2 class="section-title">Venta semanal por categoría</h2>
-    <div class="card">
+    <div class="card" style="margin-bottom:0;">
+        <h2 class="card-title"><?= icono('venta') ?> Venta semanal por categoría</h2>
         <div style="display:flex; align-items:center; justify-content:center; gap:32px; flex-wrap:wrap;">
             <?= donutSvg($pctEmpresas, $pctOtros) ?>
             <div style="text-align:left; min-width:200px;">
@@ -76,6 +66,18 @@ require __DIR__ . '/../includes/layout_header.php';
                 </p>
                 <p style="margin:14px 0 0; font-size:13px; color:var(--color-text-secondary);">Total general: <strong style="color:var(--color-text);"><?= pesos($actual['venta_general']) ?></strong></p>
             </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div class="stat-head"><?= icono('pipeline') ?><span class="stat-label">Total pipeline</span></div>
+            <span class="stat-value"><?= pesos($actual['total_pipeline_snapshot']) ?></span>
+        </div>
+        <div class="stat-card">
+            <div class="stat-head"><?= icono('venta') ?><span class="stat-label">Pronóstico ponderado</span></div>
+            <span class="stat-value"><?= pesos($actual['pronostico_ponderado_snapshot']) ?></span>
         </div>
     </div>
 <?php endif; ?>
