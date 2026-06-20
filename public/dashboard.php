@@ -33,26 +33,10 @@ require __DIR__ . '/../includes/layout_header.php';
     $pctEmpresas = $servicio->participacion((float) $actual['venta_empresas'], (float) $actual['venta_general']) * 100;
     $pctOtros = $servicio->participacion($ventaOtros, (float) $actual['venta_general']) * 100;
 
-    $radioGauge = 68;
-    $circunferenciaGauge = 2 * M_PI * $radioGauge;
-    $metaMesFloat = (float) $actual['meta_mes'];
-    $fraccionMeta = $metaMesFloat > 0 ? ((float) $actual['pronostico_ponderado_snapshot'] / $metaMesFloat) : 0;
-    $fraccionVisualGauge = min(max($fraccionMeta, 0), 1);
-    $longitudVisibleGauge = $circunferenciaGauge * $fraccionVisualGauge;
-    $colorGauge = ['rojo' => '#FF0000', 'ambar' => '#FFC000', 'verde' => '#00B050'][$semaforo] ?? '#5b6472';
-    $porcentajeGaugeTexto = number_format($fraccionMeta * 100, 0);
     ?>
     <div class="card" style="text-align:center;">
         <h2 class="card-title" style="justify-content:center;"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
-        <svg width="170" height="170" viewBox="0 0 170 170" role="img" aria-label="Pronóstico ponderado: <?= $porcentajeGaugeTexto ?>% de la meta del mes, semáforo <?= strtoupper($semaforo) ?>">
-            <circle cx="85" cy="85" r="<?= $radioGauge ?>" fill="none" stroke="#eef1f6" stroke-width="16"/>
-            <circle cx="85" cy="85" r="<?= $radioGauge ?>" fill="none" stroke="<?= $colorGauge ?>" stroke-width="16"
-                    stroke-linecap="round"
-                    stroke-dasharray="<?= $longitudVisibleGauge ?> <?= $circunferenciaGauge ?>"
-                    transform="rotate(-90 85 85)"/>
-            <text x="85" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#1c2333"><?= $porcentajeGaugeTexto ?>%</text>
-            <text x="85" y="103" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#5b6472">de la meta</text>
-        </svg>
+        <?= gaugeSvg($semaforo, (float) $actual['pronostico_ponderado_snapshot'], (float) $actual['meta_mes']) ?>
         <p style="margin:10px 0 0; font-size:13px; color:var(--color-text-secondary);">
             <?= pesos($actual['pronostico_ponderado_snapshot']) ?> de <?= pesos($actual['meta_mes']) ?> — semáforo
             <span class="<?= $semaforo ?>"><?= strtoupper($semaforo) ?></span>

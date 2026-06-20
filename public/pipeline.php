@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 requireRole('ejecutivo');
 
+use App\Models\MetaMensual;
 use App\Models\Oportunidad;
 use App\Models\Parametro;
 use App\Services\PipelineCalculator;
@@ -61,9 +62,27 @@ if (isset($_GET['editar'])) {
     }
 }
 
+$montosActivos = array_column(Oportunidad::activasByEjecutivo($ejecutivoId), 'monto');
+$totalPipelineLive = $calculator->totalPipeline($montosActivos);
+$pronosticoLive = $calculator->pronosticoPonderado($totalPipelineLive);
+$metaDelMes = MetaMensual::forEjecutivoMes($ejecutivoId, (int) $hoy->format('Y'), (int) $hoy->format('n'));
+$metaMesLive = (float) ($metaDelMes['monto_meta'] ?? 0);
+$semaforoLive = $calculator->semaforo($pronosticoLive, $metaMesLive);
+
 require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Mi Pipeline</h1>
+
+<div class="card" style="text-align:center;">
+    <h2 class="card-title" style="justify-content:center;"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
+    <?= gaugeSvg($semaforoLive, $pronosticoLive, $metaMesLive) ?>
+    <p style="margin:10px 0 0; font-size:13px; color:var(--color-text-secondary);">
+        <?= pesos($pronosticoLive) ?> de <?= $metaMesLive > 0 ? pesos($metaMesLive) : 'sin meta asignada' ?> — pipeline activo: <?= pesos($totalPipelineLive) ?>
+    </p>
+    <?php if ($metaMesLive <= 0): ?>
+        <p class="field-hint" style="margin-top:8px;">Pídele a tu admin que te asigne la meta del mes para ver tu avance real.</p>
+    <?php endif; ?>
+</div>
 
 <div class="card">
     <h2 class="card-title"><?= icono('pipeline') ?> <?= $enEdicion ? 'Editar oportunidad' : 'Nueva oportunidad' ?></h2>

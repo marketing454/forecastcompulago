@@ -22,6 +22,25 @@ function pesos($valor): string
     }
     return number_format((float) $valor, 0, ',', '.');
 }
+
+function gaugeSvg(string $semaforo, float $valor, float $meta): string
+{
+    $radio = 68;
+    $circunferencia = 2 * M_PI * $radio;
+    $fraccion = $meta > 0 ? ($valor / $meta) : 0;
+    $fraccionVisual = min(max($fraccion, 0), 1);
+    $longitudVisible = $circunferencia * $fraccionVisual;
+    $color = ['rojo' => '#FF0000', 'ambar' => '#FFC000', 'verde' => '#00B050'][$semaforo] ?? '#5b6472';
+    $porcentaje = number_format($fraccion * 100, 0);
+    $etiqueta = htmlspecialchars('Pronóstico ponderado: ' . $porcentaje . '% de la meta del mes, semáforo ' . strtoupper($semaforo));
+
+    return '<svg width="170" height="170" viewBox="0 0 170 170" role="img" aria-label="' . $etiqueta . '">'
+        . '<circle cx="85" cy="85" r="' . $radio . '" fill="none" stroke="#eef1f6" stroke-width="16"/>'
+        . '<circle cx="85" cy="85" r="' . $radio . '" fill="none" stroke="' . $color . '" stroke-width="16" stroke-linecap="round" stroke-dasharray="' . $longitudVisible . ' ' . $circunferencia . '" transform="rotate(-90 85 85)"/>'
+        . '<text x="85" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#1c2333">' . $porcentaje . '%</text>'
+        . '<text x="85" y="103" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#5b6472">de la meta</text>'
+        . '</svg>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
