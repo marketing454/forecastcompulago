@@ -14,6 +14,14 @@ function icono(string $nombre): string
     $contenido = $trazos[$nombre] ?? '';
     return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $contenido . '</svg>';
 }
+
+function pesos($valor): string
+{
+    if ($valor === null || $valor === '') {
+        return '';
+    }
+    return number_format((float) $valor, 0, ',', '.');
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">

@@ -40,11 +40,11 @@ require __DIR__ . '/../includes/layout_header.php';
         </div>
         <div class="stat-card">
             <div class="stat-head"><?= icono('pipeline') ?><span class="stat-label">Total pipeline</span></div>
-            <span class="stat-value"><?= number_format((float) $actual['total_pipeline_snapshot'], 0) ?></span>
+            <span class="stat-value"><?= pesos($actual['total_pipeline_snapshot']) ?></span>
         </div>
         <div class="stat-card">
             <div class="stat-head"><?= icono('venta') ?><span class="stat-label">Pronóstico ponderado</span></div>
-            <span class="stat-value"><?= number_format((float) $actual['pronostico_ponderado_snapshot'], 0) ?></span>
+            <span class="stat-value"><?= pesos($actual['pronostico_ponderado_snapshot']) ?></span>
         </div>
     </div>
 
@@ -55,8 +55,8 @@ require __DIR__ . '/../includes/layout_header.php';
             <div style="background:#90a4d4; width:<?= $pctOtros ?>%;"></div>
         </div>
         <p style="margin:14px 0 0; font-size:14px; color:var(--color-text-secondary);">
-            Empresas: <strong style="color:var(--color-text);"><?= number_format((float) $actual['venta_empresas'], 0) ?></strong> (<?= number_format($pctEmpresas, 1) ?>%) —
-            Otros: <strong style="color:var(--color-text);"><?= number_format($ventaOtros, 0) ?></strong> (<?= number_format($pctOtros, 1) ?>%)
+            Empresas: <strong style="color:var(--color-text);"><?= pesos($actual['venta_empresas']) ?></strong> (<?= number_format($pctEmpresas, 1) ?>%) —
+            Otros: <strong style="color:var(--color-text);"><?= pesos($ventaOtros) ?></strong> (<?= number_format($pctOtros, 1) ?>%)
         </p>
     </div>
 <?php endif; ?>
@@ -75,9 +75,9 @@ require __DIR__ . '/../includes/layout_header.php';
         <?php $s = $calculator->semaforo((float) $reporte['pronostico_ponderado_snapshot'], (float) $reporte['meta_mes']); ?>
         <tr>
             <td><?= $reporte['fecha_reporte'] ?></td>
-            <td class="num"><?= number_format((float) $reporte['meta_mes'], 0) ?></td>
-            <td class="num"><?= number_format((float) $reporte['venta_general'], 0) ?></td>
-            <td class="num"><?= number_format((float) $reporte['pronostico_ponderado_snapshot'], 0) ?></td>
+            <td class="num"><?= pesos($reporte['meta_mes']) ?></td>
+            <td class="num"><?= pesos($reporte['venta_general']) ?></td>
+            <td class="num"><?= pesos($reporte['pronostico_ponderado_snapshot']) ?></td>
             <td><span class="<?= $s ?>"><?= strtoupper($s) ?></span></td>
             <td class="table-actions-cell">
                 <a href="/reporte.php?semana=<?= $reporte['fecha_reporte'] ?>" class="btn btn-secondary btn-sm">Editar</a>

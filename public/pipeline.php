@@ -98,7 +98,7 @@ require __DIR__ . '/../includes/layout_header.php';
             </div>
             <div>
                 <label for="monto">Monto</label>
-                <input type="number" id="monto" name="monto" step="0.01" min="0" placeholder="0" value="<?= htmlspecialchars((string) ($enEdicion['monto'] ?? '')) ?>" required>
+                <input type="text" id="monto" name="monto" inputmode="numeric" data-moneda placeholder="0" value="<?= pesos($enEdicion['monto'] ?? '') ?>" required>
             </div>
             <div>
                 <label for="estado">Estado</label>
@@ -134,7 +134,7 @@ require __DIR__ . '/../includes/layout_header.php';
             <td><?= htmlspecialchars($op['cuenta']) ?><?= $op['activa'] ? '' : ' <span class="badge badge-neutral">Inactiva</span>' ?></td>
             <td><?= htmlspecialchars($op['nit']) ?></td>
             <td><span class="badge badge-tipo"><?= htmlspecialchars($op['tipo']) ?></span></td>
-            <td class="num"><?= number_format((float) $op['monto'], 0) ?></td>
+            <td class="num"><?= pesos($op['monto']) ?></td>
             <td class="num"><?= $dias ?></td>
             <td><?= $calculator->probabilidad($dias) ?></td>
             <td><span class="badge badge-estado-<?= htmlspecialchars(strtolower($op['estado'])) ?>" title="<?= htmlspecialchars($estados[$op['estado']] ?? '') ?>"><?= htmlspecialchars($op['estado']) ?></span></td>

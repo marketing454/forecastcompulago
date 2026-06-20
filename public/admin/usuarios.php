@@ -112,7 +112,7 @@ require __DIR__ . '/../../includes/layout_header.php';
                 <form method="post" class="form-row">
                     <input type="hidden" name="accion" value="meta">
                     <input type="hidden" name="ejecutivo_id" value="<?= $ej['id'] ?>">
-                    <input type="number" name="monto_meta" step="0.01" placeholder="Sin meta asignada" value="<?= $metaActual ? htmlspecialchars((string) $metaActual['monto_meta']) : '' ?>" style="max-width:160px;">
+                    <input type="text" name="monto_meta" inputmode="numeric" data-moneda placeholder="Sin meta asignada" value="<?= $metaActual ? pesos($metaActual['monto_meta']) : '' ?>" style="max-width:160px;">
                     <button type="submit" class="btn-sm">Guardar</button>
                 </form>
             </td>

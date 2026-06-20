@@ -65,11 +65,11 @@ require __DIR__ . '/../includes/layout_header.php';
 <div class="stat-grid">
     <div class="stat-card">
         <div class="stat-head"><?= icono('pipeline') ?><span class="stat-label">Total pipeline activo</span></div>
-        <span class="stat-value"><?= number_format($totalPipeline, 0) ?></span>
+        <span class="stat-value"><?= pesos($totalPipeline) ?></span>
     </div>
     <div class="stat-card">
         <div class="stat-head"><?= icono('meta') ?><span class="stat-label">Pronóstico ponderado</span></div>
-        <span class="stat-value"><?= number_format($pronostico, 0) ?></span>
+        <span class="stat-value"><?= pesos($pronostico) ?></span>
     </div>
 </div>
 
@@ -78,13 +78,13 @@ require __DIR__ . '/../includes/layout_header.php';
     <form method="post" id="form-reporte">
         <input type="hidden" name="fecha_semana" value="<?= htmlspecialchars($fechaSemana) ?>">
         <label for="meta_mes">Meta del mes</label>
-        <input type="number" id="meta_mes" name="meta_mes" step="0.01" min="0" value="<?= htmlspecialchars((string) $metaMesDefault) ?>" required>
+        <input type="text" id="meta_mes" name="meta_mes" inputmode="numeric" data-moneda value="<?= pesos($metaMesDefault) ?>" required>
 
         <label for="venta_empresas">Venta empresas (esta semana)</label>
-        <input type="number" id="venta_empresas" name="venta_empresas" step="0.01" min="0" value="<?= htmlspecialchars((string) ($reporteActual['venta_empresas'] ?? '')) ?>" required>
+        <input type="text" id="venta_empresas" name="venta_empresas" inputmode="numeric" data-moneda value="<?= pesos($reporteActual['venta_empresas'] ?? '') ?>" required>
 
         <label for="venta_general">Venta general (esta semana)</label>
-        <input type="number" id="venta_general" name="venta_general" step="0.01" min="0" value="<?= htmlspecialchars((string) ($reporteActual['venta_general'] ?? '')) ?>" required>
+        <input type="text" id="venta_general" name="venta_general" inputmode="numeric" data-moneda value="<?= pesos($reporteActual['venta_general'] ?? '') ?>" required>
         <span class="field-hint" id="preview-otros">Escribe ambos montos para ver el desglose por categoría.</span>
 
         <label for="comentarios">Comentarios</label>
@@ -105,8 +105,8 @@ require __DIR__ . '/../includes/layout_header.php';
     var formato = new Intl.NumberFormat('es-CO');
 
     function actualizar() {
-        var g = parseFloat(general.value) || 0;
-        var e = parseFloat(empresas.value) || 0;
+        var g = parseFloat(general.value.replace(/\D/g, '')) || 0;
+        var e = parseFloat(empresas.value.replace(/\D/g, '')) || 0;
         preview.classList.remove('field-hint-error', 'field-hint-success');
 
         if (g <= 0) {
