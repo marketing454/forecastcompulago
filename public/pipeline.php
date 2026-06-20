@@ -73,15 +73,24 @@ require __DIR__ . '/../includes/layout_header.php';
 ?>
 <h1 class="page-title">Mi Pipeline</h1>
 
-<div class="card" style="text-align:center;">
-    <h2 class="card-title" style="justify-content:center;"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
-    <?= gaugeSvg($semaforoLive, $pronosticoLive, $metaMesLive) ?>
-    <p style="margin:10px 0 0; font-size:13px; color:var(--color-text-secondary);">
-        <?= pesos($pronosticoLive) ?> de <?= $metaMesLive > 0 ? pesos($metaMesLive) : 'sin meta asignada' ?> — pipeline activo: <?= pesos($totalPipelineLive) ?>
-    </p>
-    <?php if ($metaMesLive <= 0): ?>
-        <p class="field-hint" style="margin-top:8px;">Pídele a tu admin que te asigne la meta del mes para ver tu avance real.</p>
-    <?php endif; ?>
+<div class="card">
+    <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
+    <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+        <div style="flex-shrink:0;"><?= gaugeSvg($semaforoLive, $pronosticoLive, $metaMesLive) ?></div>
+        <div style="flex:1; min-width:220px;">
+            <span class="stat-label" style="display:block; margin-bottom:8px;">Pronóstico ponderado</span>
+            <span class="stat-value" style="font-size:30px;"><?= pesos($pronosticoLive) ?></span>
+            <p style="margin:12px 0 0; font-size:16px; color:var(--color-text-secondary);">
+                de <strong style="color:var(--color-text);"><?= $metaMesLive > 0 ? pesos($metaMesLive) : 'sin meta asignada' ?></strong>
+            </p>
+            <p style="margin:6px 0 0; font-size:16px; color:var(--color-text-secondary);">
+                Pipeline activo: <strong style="color:var(--color-text);"><?= pesos($totalPipelineLive) ?></strong>
+            </p>
+            <?php if ($metaMesLive <= 0): ?>
+                <p class="field-hint" style="margin-top:10px;">Pídele a tu admin que te asigne la meta del mes para ver tu avance real.</p>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 <div class="card">

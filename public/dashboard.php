@@ -34,13 +34,21 @@ require __DIR__ . '/../includes/layout_header.php';
     $pctOtros = $servicio->participacion($ventaOtros, (float) $actual['venta_general']) * 100;
 
     ?>
-    <div class="card" style="text-align:center;">
-        <h2 class="card-title" style="justify-content:center;"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
-        <?= gaugeSvg($semaforo, (float) $actual['pronostico_ponderado_snapshot'], (float) $actual['meta_mes']) ?>
-        <p style="margin:10px 0 0; font-size:13px; color:var(--color-text-secondary);">
-            <?= pesos($actual['pronostico_ponderado_snapshot']) ?> de <?= pesos($actual['meta_mes']) ?> — semáforo
-            <span class="<?= $semaforo ?>"><?= strtoupper($semaforo) ?></span>
-        </p>
+    <div class="card">
+        <h2 class="card-title"><?= icono('meta') ?> Pronóstico vs meta del mes</h2>
+        <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
+            <div style="flex-shrink:0;"><?= gaugeSvg($semaforo, (float) $actual['pronostico_ponderado_snapshot'], (float) $actual['meta_mes']) ?></div>
+            <div style="flex:1; min-width:220px;">
+                <span class="stat-label" style="display:block; margin-bottom:8px;">Pronóstico ponderado</span>
+                <span class="stat-value" style="font-size:30px;"><?= pesos($actual['pronostico_ponderado_snapshot']) ?></span>
+                <p style="margin:12px 0 0; font-size:16px; color:var(--color-text-secondary);">
+                    de <strong style="color:var(--color-text);"><?= pesos($actual['meta_mes']) ?></strong>
+                </p>
+                <p style="margin:6px 0 0; font-size:16px; color:var(--color-text-secondary);">
+                    Semáforo: <span class="<?= $semaforo ?>"><?= strtoupper($semaforo) ?></span>
+                </p>
+            </div>
+        </div>
     </div>
 
     <div class="stat-grid">
